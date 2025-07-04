@@ -27,7 +27,7 @@
 
     #search-box {
       width: 100%;
-      max-width: 800px;
+      max-width: 900px;
       margin: 0 auto 1rem;
       display: block;
       padding: 0.75rem;
@@ -37,42 +37,48 @@
     }
 
     .filters {
-      max-width: 800px;
-      margin: 0 auto 1rem;
+      max-width: 1000px;
+      margin: 0 auto;
       display: flex;
       flex-wrap: wrap;
-      gap: 1.5rem;
-      justify-content: space-between;
+      gap: 1rem;
+      justify-content: center;
     }
 
     .filter-group {
-      flex: 1 1 180px;
+      flex: 1 1 200px;
       background: #fff;
-      padding: 0.75rem;
+      padding: 0.5rem;
       border-radius: 6px;
       border: 1px solid #ccc;
+      min-width: 180px;
     }
 
     .filter-group h4 {
       margin: 0 0 0.5rem;
-      font-size: 1rem;
+      font-size: 0.95rem;
     }
 
     .checkbox-list {
-      max-height: 150px;
+      max-height: 110px;
       overflow-y: auto;
+      border: 1px solid #eee;
+      padding: 0.25rem;
+      border-radius: 4px;
+      background: #fafafa;
     }
 
     .checkbox-list label {
       display: block;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       margin-bottom: 0.25rem;
+      cursor: pointer;
     }
 
     .filter-group button {
-      margin-top: 0.5rem;
+      margin-top: 0.25rem;
       padding: 0.25rem 0.5rem;
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       cursor: pointer;
       border: 1px solid #aaa;
       background: #eee;
@@ -80,8 +86,8 @@
     }
 
     .court-list {
-      max-width: 800px;
-      margin: auto;
+      max-width: 900px;
+      margin: 2rem auto;
     }
 
     .court-card {
@@ -118,9 +124,10 @@
       text-decoration: underline;
     }
 
-    @media (max-width: 600px) {
+    @media (max-width: 700px) {
       .filters {
         flex-direction: column;
+        align-items: stretch;
       }
     }
   </style>
@@ -131,8 +138,9 @@
 
   <div id="sticky-filters">
     <input type="text" id="search-box" placeholder="Search courts by name, lighting, etc.">
+
     <div class="filters" id="filters-container">
-      <!-- Filters will be inserted here dynamically -->
+      <!-- Filters will be generated dynamically -->
     </div>
   </div>
 
@@ -173,18 +181,17 @@
         checkbox.value = opt;
         checkbox.dataset.field = fieldID;
 
-        const label = document.createElement("label");
-        label.htmlFor = id;
-        label.textContent = opt;
-
-        label.prepend(checkbox);
-        list.appendChild(label);
+        const labelEl = document.createElement("label");
+        labelEl.htmlFor = id;
+        labelEl.textContent = opt;
+        labelEl.prepend(checkbox);
+        list.appendChild(labelEl);
       });
 
       const button = document.createElement("button");
-      button.textContent = "Select All";
+      button.textContent = "Reset";
       button.onclick = () => {
-        list.querySelectorAll("input[type=checkbox]").forEach(cb => cb.checked = true);
+        list.querySelectorAll("input[type=checkbox]").forEach(cb => cb.checked = false);
         applyFiltersAndSearch();
       };
 
