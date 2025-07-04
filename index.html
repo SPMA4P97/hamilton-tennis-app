@@ -8,61 +8,141 @@
       font-family: sans-serif;
       padding: 2rem;
       background: #f4f4f4;
+      margin: 0;
     }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    #search-box {
+      width: 100%;
+      max-width: 800px;
+      margin: 0 auto 2rem;
+      display: block;
+      padding: 0.75rem;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    .court-list {
+      max-width: 800px;
+      margin: auto;
+    }
+
     .court-card {
       background: white;
       padding: 1rem;
       border-radius: 8px;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      margin-bottom: 1rem;
+      margin-bottom: 1.5rem;
     }
-    .court-list {
-      max-width: 800px;
-      margin: auto;
+
+    .badge {
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      font-weight: bold;
+      color: white;
+      display: inline-block;
+    }
+
+    .badge.lighting {
+      background-color: #0077cc;
+    }
+
+    .badge.type {
+      background-color: #28a745;
+    }
+
+    a {
+      color: #0066cc;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 1rem;
+      }
+
+      .court-card {
+        padding: 0.75rem;
+      }
+
+      #search-box {
+        padding: 0.5rem;
+      }
     }
   </style>
 </head>
 <body>
   <h1>Hamilton Tennis Courts</h1>
+  <input type="text" id="search-box" placeholder="Search courts by name, lighting, etc.">
   <div class="court-list" id="court-list">Loading...</div>
 
   <script>
     const sheetID = "1ZghEOmrIgbT8PIoR-5-ysZWNohyGHz-WEEU-BpeL5_U";
-    const sheetName = "Sheet1"; // or whatever your tab is called
+    const sheetName = "Sheet1";
     const url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&sheet=${sheetName}`;
+
+    let rows = [];
+    let cols = [];
+
+    function renderCards(dataRows, dataCols) {
+      const list = document.getElementById("court-list");
+      list.innerHTML = '';
+
+      dataRows.forEach(row => {
+        const data = {};
+        row.c.forEach((cell, i) => {
+          data[dataCols[i]] = cell ? cell.v : '';
+        });
+
+        const card = document.createElement("div");
+        card.className = "court-card";
+        card.innerHTML = `
+          <h3>${data['Location Name']}</h3>
+          <p><strong>Address:</strong> ${data['Address']}</p>
+          <p><strong>Outdoor Courts:</strong> ${data['Outdoor Courts #'] || 'N/A'}</p>
+          <p><strong>Indoor Courts:</strong> ${data['Indoor Courts #'] || 'N/A'}</p>
+          <p><strong>Lighting:</strong> <span class="badge lighting">${data['Lighting'] || 'Unknown'}</span></p>
+          <p><strong>Type:</strong> <span class="badge type">${data['Indoor/Outdoor/Both'] || 'N/A'}</span></p>
+          <p>
+            <a href="https://www.google.com/maps?q=${data['Latitude']},${data['Longitude']}" target="_blank">
+              📍 View on Google Maps
+            </a>
+          </p>
+        `;
+        list.appendChild(card);
+      });
+    }
 
     fetch(url)
       .then(res => res.text())
       .then(text => {
         const json = JSON.parse(text.substr(47).slice(0, -2));
-        const rows = json.table.rows;
-        const cols = json.table.cols.map(c => c.label);
-        const list = document.getElementById("court-list");
-        list.innerHTML = '';
-
-        rows.forEach(row => {
-          const data = {};
-          row.c.forEach((cell, i) => {
-            data[cols[i]] = cell ? cell.v : '';
-          });
-
-          const card = document.createElement("div");
-          card.className = "court-card";
-          card.innerHTML = `
-            <h3>${data['Location Name']}</h3>
-            <p><strong>Address:</strong> ${data['Address']}</p>
-            <p><strong>Outdoor Courts:</strong> ${data['Outdoor Courts #'] || 'N/A'}</p>
-            <p><strong>Indoor Courts:</strong> ${data['Indoor Courts #'] || 'N/A'}</p>
-            <p><strong>Lighting:</strong> ${data['Lighting'] || 'Unknown'}</p>
-            <p><strong>Indoor/Outdoor/Both:</strong> ${data['Indoor/Outdoor/Both'] || 'N/A'}</p>
-          `;
-          list.appendChild(card);
-        });
+        rows = json.table.rows;
+        cols = json.table.cols.map(c => c.label);
+        renderCards(rows, cols);
       })
       .catch(err => {
         document.getElementById("court-list").innerHTML = "Failed to load data.";
         console.error("Fetch error:", err);
       });
+
+    document.getElementById('search-box').addEventListener('input', e => {
+      const keyword = e.target.value.toLowerCase();
+      const filtered = rows.filter(row => {
+        return row.c.some(cell => cell && cell.v && cell.v.toString().toLowerCase().includes(keyword));
+      });
+      renderCards(filtered, cols);
+    });
   </script>
 </body>
 </html>
