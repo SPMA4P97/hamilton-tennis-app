@@ -6,14 +6,14 @@
   <style>
     body {
       font-family: sans-serif;
-      padding: 2rem;
       background: #f4f4f4;
       margin: 0;
+      padding: 2rem 1rem;
     }
 
     h1 {
       text-align: center;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1rem;
     }
 
     #sticky-filters {
@@ -36,33 +36,47 @@
       border-radius: 6px;
     }
 
-    #filters {
+    .filters {
       max-width: 800px;
       margin: 0 auto 1rem;
       display: flex;
       flex-wrap: wrap;
-      gap: 0.75rem;
-      align-items: start;
+      gap: 1.5rem;
+      justify-content: space-between;
     }
 
-    select {
+    .filter-group {
       flex: 1 1 180px;
-      padding: 0.5rem;
-      font-size: 1rem;
-      border: 1px solid #ccc;
+      background: #fff;
+      padding: 0.75rem;
       border-radius: 6px;
-      min-height: 3.5rem;
+      border: 1px solid #ccc;
     }
 
-    #reset-filters {
-      padding: 0.5rem 1rem;
+    .filter-group h4 {
+      margin: 0 0 0.5rem;
       font-size: 1rem;
-      height: 3.5rem;
-      white-space: nowrap;
+    }
+
+    .checkbox-list {
+      max-height: 150px;
+      overflow-y: auto;
+    }
+
+    .checkbox-list label {
+      display: block;
+      font-size: 0.9rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .filter-group button {
+      margin-top: 0.5rem;
+      padding: 0.25rem 0.5rem;
+      font-size: 0.8rem;
       cursor: pointer;
-      border: 1px solid #ccc;
-      border-radius: 6px;
+      border: 1px solid #aaa;
       background: #eee;
+      border-radius: 4px;
     }
 
     .court-list {
@@ -105,32 +119,20 @@
     }
 
     @media (max-width: 600px) {
-      body {
-        padding: 1rem;
-      }
-
-      .court-card {
-        padding: 0.75rem;
-      }
-
-      #search-box, select {
-        font-size: 1rem;
+      .filters {
+        flex-direction: column;
       }
     }
   </style>
 </head>
 <body>
+
   <h1>Hamilton Tennis Courts</h1>
 
   <div id="sticky-filters">
     <input type="text" id="search-box" placeholder="Search courts by name, lighting, etc.">
-    
-    <div id="filters">
-      <select id="filter-type" multiple></select>
-      <select id="filter-season" multiple></select>
-      <select id="filter-lighting" multiple></select>
-      <select id="filter-court" multiple></select>
-      <button id="reset-filters">Reset</button>
+    <div class="filters" id="filters-container">
+      <!-- Filters will be inserted here dynamically -->
     </div>
   </div>
 
@@ -141,17 +143,57 @@
     const sheetName = "Sheet1";
     const url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&sheet=${sheetName}`;
 
+    const filterFields = [
+      { id: "Indoor/Outdoor/Both", label: "Court Type" },
+      { id: "Seasonal Opportunity", label: "Season" },
+      { id: "Lighting", label: "Lighting" },
+      { id: "Court Type", label: "Surface" }
+    ];
+
     let rows = [];
     let cols = [];
+    let filters = {};
 
-    const filters = {
-      type: document.getElementById("filter-type"),
-      season: document.getElementById("filter-season"),
-      lighting: document.getElementById("filter-lighting"),
-      court: document.getElementById("filter-court")
-    };
+    function createFilterGroup(fieldID, label, options) {
+      const container = document.createElement("div");
+      container.className = "filter-group";
 
-    const getSelectedValues = select => Array.from(select.selectedOptions).map(o => o.value.toLowerCase());
+      const title = document.createElement("h4");
+      title.textContent = label;
+
+      const list = document.createElement("div");
+      list.className = "checkbox-list";
+      list.dataset.field = fieldID;
+
+      options.forEach(opt => {
+        const id = `${fieldID}-${opt.replace(/\s+/g, "_")}`;
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.id = id;
+        checkbox.value = opt;
+        checkbox.dataset.field = fieldID;
+
+        const label = document.createElement("label");
+        label.htmlFor = id;
+        label.textContent = opt;
+
+        label.prepend(checkbox);
+        list.appendChild(label);
+      });
+
+      const button = document.createElement("button");
+      button.textContent = "Select All";
+      button.onclick = () => {
+        list.querySelectorAll("input[type=checkbox]").forEach(cb => cb.checked = true);
+        applyFiltersAndSearch();
+      };
+
+      container.appendChild(title);
+      container.appendChild(list);
+      container.appendChild(button);
+
+      return container;
+    }
 
     function getColumnOptions(colName) {
       const idx = cols.indexOf(colName);
@@ -164,19 +206,20 @@
     }
 
     function populateFilters() {
-      populateFilter(filters.type, getColumnOptions("Indoor/Outdoor/Both"));
-      populateFilter(filters.season, getColumnOptions("Seasonal Opportunity"));
-      populateFilter(filters.lighting, getColumnOptions("Lighting"));
-      populateFilter(filters.court, getColumnOptions("Court Type"));
+      const container = document.getElementById("filters-container");
+      filterFields.forEach(field => {
+        const options = getColumnOptions(field.id);
+        const group = createFilterGroup(field.id, field.label, options);
+        container.appendChild(group);
+        filters[field.id] = group.querySelectorAll("input[type=checkbox]");
+        filters[field.id].forEach(cb => cb.addEventListener("change", applyFiltersAndSearch));
+      });
     }
 
-    function populateFilter(selectEl, options) {
-      options.forEach(val => {
-        const option = document.createElement("option");
-        option.value = val;
-        option.textContent = val;
-        selectEl.appendChild(option);
-      });
+    function getSelectedValues(fieldID) {
+      return Array.from(filters[fieldID])
+        .filter(cb => cb.checked)
+        .map(cb => cb.value.toLowerCase());
     }
 
     function renderCards(dataRows, dataCols) {
@@ -212,11 +255,11 @@
     }
 
     function applyFiltersAndSearch() {
-      const search = document.getElementById('search-box').value.toLowerCase();
-      const selectedType = getSelectedValues(filters.type);
-      const selectedSeason = getSelectedValues(filters.season);
-      const selectedLighting = getSelectedValues(filters.lighting);
-      const selectedCourt = getSelectedValues(filters.court);
+      const search = document.getElementById("search-box").value.toLowerCase();
+      const selected = {};
+      filterFields.forEach(field => {
+        selected[field.id] = getSelectedValues(field.id);
+      });
 
       const filtered = rows.filter(row => {
         const rowData = {};
@@ -225,12 +268,13 @@
         });
 
         const matchesSearch = Object.values(rowData).some(val => val.includes(search));
-        const matchesType = selectedType.length === 0 || selectedType.includes(rowData["Indoor/Outdoor/Both"]);
-        const matchesSeason = selectedSeason.length === 0 || selectedSeason.includes(rowData["Seasonal Opportunity"]);
-        const matchesLighting = selectedLighting.length === 0 || selectedLighting.includes(rowData["Lighting"]);
-        const matchesCourt = selectedCourt.length === 0 || selectedCourt.includes(rowData["Court Type"]);
 
-        return matchesSearch && matchesType && matchesSeason && matchesLighting && matchesCourt;
+        const matchesFilters = filterFields.every(field => {
+          const selectedVals = selected[field.id];
+          return selectedVals.length === 0 || selectedVals.includes(rowData[field.id]);
+        });
+
+        return matchesSearch && matchesFilters;
       });
 
       renderCards(filtered, cols);
@@ -251,15 +295,7 @@
       });
 
     document.getElementById('search-box').addEventListener('input', applyFiltersAndSearch);
-    Object.values(filters).forEach(select => select.addEventListener('change', applyFiltersAndSearch));
-
-    document.getElementById("reset-filters").addEventListener("click", () => {
-      document.getElementById("search-box").value = "";
-      Object.values(filters).forEach(select => {
-        Array.from(select.options).forEach(opt => opt.selected = false);
-      });
-      renderCards(rows, cols);
-    });
   </script>
+
 </body>
 </html>
