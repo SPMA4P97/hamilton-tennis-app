@@ -19,12 +19,36 @@
     #search-box {
       width: 100%;
       max-width: 800px;
-      margin: 0 auto 2rem;
+      margin: 0 auto 1.5rem;
       display: block;
       padding: 0.75rem;
       font-size: 1rem;
       border: 1px solid #ccc;
       border-radius: 6px;
+    }
+
+    #filters {
+      max-width: 800px;
+      margin: 0 auto 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    select {
+      flex: 1 1 180px;
+      padding: 0.5rem;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    #reset-filters {
+      margin: 1rem auto 2rem;
+      display: block;
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      cursor: pointer;
     }
 
     .court-list {
@@ -75,15 +99,26 @@
         padding: 0.75rem;
       }
 
-      #search-box {
-        padding: 0.5rem;
+      #search-box, select {
+        font-size: 1rem;
       }
     }
   </style>
 </head>
 <body>
   <h1>Hamilton Tennis Courts</h1>
+
   <input type="text" id="search-box" placeholder="Search courts by name, lighting, etc.">
+
+  <div id="filters">
+    <select id="filter-type"><option value="">All Types</option></select>
+    <select id="filter-season"><option value="">All Seasons</option></select>
+    <select id="filter-lighting"><option value="">All Lighting</option></select>
+    <select id="filter-court"><option value="">All Court Types</option></select>
+  </div>
+
+  <button id="reset-filters">🔄 Reset Filters</button>
+
   <div class="court-list" id="court-list">Loading...</div>
 
   <script>
@@ -94,9 +129,47 @@
     let rows = [];
     let cols = [];
 
+    const filters = {
+      type: document.getElementById("filter-type"),
+      season: document.getElementById("filter-season"),
+      lighting: document.getElementById("filter-lighting"),
+      court: document.getElementById("filter-court")
+    };
+
+    function getColumnOptions(colName) {
+      const idx = cols.indexOf(colName);
+      const values = new Set();
+      rows.forEach(row => {
+        const val = row.c[idx]?.v;
+        if (val) values.add(val);
+      });
+      return Array.from(values).sort();
+    }
+
+    function populateFilters() {
+      populateFilter(filters.type, getColumnOptions("Indoor/Outdoor/Both"));
+      populateFilter(filters.season, getColumnOptions("Seasonal Opportunity"));
+      populateFilter(filters.lighting, getColumnOptions("Lighting"));
+      populateFilter(filters.court, getColumnOptions("Court Type"));
+    }
+
+    function populateFilter(selectEl, options) {
+      options.forEach(val => {
+        const option = document.createElement("option");
+        option.value = val;
+        option.textContent = val;
+        selectEl.appendChild(option);
+      });
+    }
+
     function renderCards(dataRows, dataCols) {
       const list = document.getElementById("court-list");
       list.innerHTML = '';
+
+      if (dataRows.length === 0) {
+        list.innerHTML = `<p style="text-align:center; font-style:italic;">No results found. Try adjusting your filters or search terms.</p>`;
+        return;
+      }
 
       dataRows.forEach(row => {
         const data = {};
@@ -113,14 +186,37 @@
           <p><strong>Indoor Courts:</strong> ${data['Indoor Courts #'] || 'N/A'}</p>
           <p><strong>Lighting:</strong> <span class="badge lighting">${data['Lighting'] || 'Unknown'}</span></p>
           <p><strong>Type:</strong> <span class="badge type">${data['Indoor/Outdoor/Both'] || 'N/A'}</span></p>
-          <p>
-            <a href="https://www.google.com/maps?q=${data['Latitude']},${data['Longitude']}" target="_blank">
-              📍 View on Google Maps
-            </a>
-          </p>
+          <p><strong>Seasonal:</strong> ${data['Seasonal Opportunity'] || 'Unknown'}</p>
+          <p><strong>Court Type:</strong> ${data['Court Type'] || 'Unknown'}</p>
+          <p><a href="https://www.google.com/maps?q=${data['Latitude']},${data['Longitude']}" target="_blank">📍 View on Google Maps</a></p>
         `;
         list.appendChild(card);
       });
+    }
+
+    function applyFiltersAndSearch() {
+      const search = document.getElementById('search-box').value.toLowerCase();
+      const selectedType = filters.type.value;
+      const selectedSeason = filters.season.value;
+      const selectedLighting = filters.lighting.value;
+      const selectedCourt = filters.court.value;
+
+      const filtered = rows.filter(row => {
+        const rowData = {};
+        row.c.forEach((cell, i) => {
+          rowData[cols[i]] = cell ? cell.v.toString().toLowerCase() : '';
+        });
+
+        const matchesSearch = Object.values(rowData).some(val => val.includes(search));
+        const matchesType = !selectedType || rowData["Indoor/Outdoor/Both"] === selectedType.toLowerCase();
+        const matchesSeason = !selectedSeason || rowData["Seasonal Opportunity"] === selectedSeason.toLowerCase();
+        const matchesLighting = !selectedLighting || rowData["Lighting"] === selectedLighting.toLowerCase();
+        const matchesCourt = !selectedCourt || rowData["Court Type"] === selectedCourt.toLowerCase();
+
+        return matchesSearch && matchesType && matchesSeason && matchesLighting && matchesCourt;
+      });
+
+      renderCards(filtered, cols);
     }
 
     fetch(url)
@@ -129,6 +225,7 @@
         const json = JSON.parse(text.substr(47).slice(0, -2));
         rows = json.table.rows;
         cols = json.table.cols.map(c => c.label);
+        populateFilters();
         renderCards(rows, cols);
       })
       .catch(err => {
@@ -136,12 +233,13 @@
         console.error("Fetch error:", err);
       });
 
-    document.getElementById('search-box').addEventListener('input', e => {
-      const keyword = e.target.value.toLowerCase();
-      const filtered = rows.filter(row => {
-        return row.c.some(cell => cell && cell.v && cell.v.toString().toLowerCase().includes(keyword));
-      });
-      renderCards(filtered, cols);
+    document.getElementById('search-box').addEventListener('input', applyFiltersAndSearch);
+    Object.values(filters).forEach(select => select.addEventListener('change', applyFiltersAndSearch));
+
+    document.getElementById("reset-filters").addEventListener("click", () => {
+      document.getElementById("search-box").value = "";
+      Object.values(filters).forEach(select => (select.value = ""));
+      renderCards(rows, cols);
     });
   </script>
 </body>
