@@ -7,12 +7,54 @@
     body {
       font-family: sans-serif;
       padding: 2rem;
-      background-color: #f9f9f9;
+      background: #f4f4f4;
+    }
+    .court-card {
+      background: white;
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      margin-bottom: 1rem;
+    }
+    .court-list {
+      max-width: 800px;
+      margin: auto;
     }
   </style>
 </head>
 <body>
   <h1>Hamilton Tennis Courts</h1>
-  <p>This is your new clean GitHub Pages site.</p>
+  <div class="court-list" id="court-list"></div>
+
+  <script src="https://unpkg.com/tabletop@1.6.4/tabletop.js"></script>
+  <script>
+    const publicSpreadsheetUrl = 'https://docs.google.com/spreadsheets/d/1ZghEOmrIgbT8PIoR-5-ysZWNohyGHz-WEEU-BpeL5_U/pubhtml';
+
+    function showInfo(data) {
+      const list = document.getElementById('court-list');
+      data.forEach(court => {
+        const card = document.createElement('div');
+        card.className = 'court-card';
+        card.innerHTML = `
+          <h3>${court['Location Name']}</h3>
+          <p><strong>Address:</strong> ${court['Address']}</p>
+          <p><strong>Outdoor Courts:</strong> ${court['Outdoor Courts #'] || 'N/A'}</p>
+          <p><strong>Indoor Courts:</strong> ${court['Indoor Courts #'] || 'N/A'}</p>
+          <p><strong>Lighting:</strong> ${court['Lighting'] || 'Unknown'}</p>
+          <p><strong>Indoor/Outdoor/Both:</strong> ${court['Indoor/Outdoor/Both'] || 'N/A'}</p>
+        `;
+        list.appendChild(card);
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      Tabletop.init({
+        key: publicSpreadsheetUrl,
+        callback: showInfo,
+        simpleSheet: true
+      });
+    });
+  </script>
 </body>
 </html>
+
