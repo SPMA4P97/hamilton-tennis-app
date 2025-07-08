@@ -77,6 +77,7 @@
 
     .filter-group button {
       margin-top: 0.25rem;
+      margin-right: 0.25rem;
       padding: 0.25rem 0.5rem;
       font-size: 0.75rem;
       cursor: pointer;
@@ -107,12 +108,17 @@
       display: inline-block;
     }
 
-    .badge.lighting {
-      background-color: #0077cc;
-    }
-
     .badge.type {
       background-color: #28a745;
+    }
+
+    .badge.lighting-yes {
+      background-color: #e6b800; /* gold/dark yellow */
+    }
+
+    .badge.lighting-no,
+    .badge.lighting-unknown {
+      background-color: #888; /* gray */
     }
 
     a {
@@ -188,16 +194,24 @@
         list.appendChild(labelEl);
       });
 
-      const button = document.createElement("button");
-      button.textContent = "Reset";
-      button.onclick = () => {
+      const selectAllBtn = document.createElement("button");
+      selectAllBtn.textContent = "Select All";
+      selectAllBtn.onclick = () => {
+        list.querySelectorAll("input[type=checkbox]").forEach(cb => cb.checked = true);
+        applyFiltersAndSearch();
+      };
+
+      const resetBtn = document.createElement("button");
+      resetBtn.textContent = "Reset";
+      resetBtn.onclick = () => {
         list.querySelectorAll("input[type=checkbox]").forEach(cb => cb.checked = false);
         applyFiltersAndSearch();
       };
 
       container.appendChild(title);
       container.appendChild(list);
-      container.appendChild(button);
+      container.appendChild(selectAllBtn);
+      container.appendChild(resetBtn);
 
       return container;
     }
@@ -244,6 +258,14 @@
           data[dataCols[i]] = cell ? cell.v : '';
         });
 
+        const lightingVal = (data['Lighting'] || 'Unknown').toLowerCase();
+        let lightingClass = 'lighting-unknown';
+        if (lightingVal.includes('yes') || lightingVal.includes('available')) {
+          lightingClass = 'lighting-yes';
+        } else if (lightingVal.includes('no')) {
+          lightingClass = 'lighting-no';
+        }
+
         const card = document.createElement("div");
         card.className = "court-card";
         card.innerHTML = `
@@ -251,7 +273,7 @@
           <p><strong>Address:</strong> ${data['Address']}</p>
           <p><strong>Outdoor Courts:</strong> ${data['Outdoor Courts #'] || 'N/A'}</p>
           <p><strong>Indoor Courts:</strong> ${data['Indoor Courts #'] || 'N/A'}</p>
-          <p><strong>Lighting:</strong> <span class="badge lighting">${data['Lighting'] || 'Unknown'}</span></p>
+          <p><strong>Lighting:</strong> <span class="badge ${lightingClass}">${data['Lighting'] || 'Unknown'}</span></p>
           <p><strong>Type:</strong> <span class="badge type">${data['Indoor/Outdoor/Both'] || 'N/A'}</span></p>
           <p><strong>Seasonal:</strong> ${data['Seasonal Opportunity'] || 'Unknown'}</p>
           <p><strong>Court Type:</strong> ${data['Court Type'] || 'Unknown'}</p>
