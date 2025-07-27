@@ -292,7 +292,7 @@
     function getSelectedValues(fieldID) {
       return Array.from(filters[fieldID])
         .filter(cb => cb.checked)
-        .map(cb => cb.value.toLowerCase());
+        .map(cb => cb.value.toLowerCase().trim());
     }
 
     function renderCards(dataRows, dataCols) {
@@ -345,14 +345,25 @@
       const filtered = rows.filter(row => {
         const rowData = {};
         row.c.forEach((cell, i) => {
-          rowData[cols[i]] = cell ? cell.v.toString().toLowerCase() : '';
+          rowData[cols[i]] = cell ? cell.v.toString().toLowerCase().trim() : '';
         });
 
-        const matchesSearch = Object.values(rowData).some(val => val.includes(search));
+        const matchesSearch = Object.values(rowData).some(val =>
+          val && val.includes(search)
+        );
 
         const matchesFilters = filterFields.every(field => {
           const selectedVals = selected[field.id];
-          return selectedVals.length === 0 || selectedVals.includes(rowData[field.id]);
+          const cellVal = rowData[field.id] || '';
+
+          if (field.id === "Indoor/Outdoor/Both" && selectedVals.length > 0) {
+            if (selectedVals.includes("indoor") && cellVal.includes("indoor")) return true;
+            if (selectedVals.includes("outdoor") && cellVal.includes("outdoor")) return true;
+            if (selectedVals.includes("indoor and outdoor") && cellVal === "indoor and outdoor") return true;
+            return false;
+          }
+
+          return selectedVals.length === 0 || selectedVals.includes(cellVal);
         });
 
         return matchesSearch && matchesFilters;
