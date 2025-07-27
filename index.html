@@ -3,8 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <title>Hamilton Tennis Courts</title>
-
-  <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-F01JC9ZZSJ"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -12,68 +10,42 @@
     gtag('js', new Date());
     gtag('config', 'G-F01JC9ZZSJ');
   </script>
-
   <style>
-    body {
-      font-family: sans-serif;
-      background: #f4f4f4;
-      margin: 0;
-      padding: 0;
-    }
+    body { font-family: sans-serif; background: #f4f4f4; margin: 0; padding: 0; }
 
     header {
-      background: #333;
-      color: white;
-      padding: 1rem 1.5rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      background: #333; color: white; padding: 1rem 1.5rem;
+      display: flex; justify-content: space-between; align-items: center;
     }
 
-    header h1 {
-      margin: 0;
-      font-size: 1.2rem;
-    }
+    header h1 { margin: 0; font-size: 1.2rem; }
 
     nav {
-      display: flex;
-      gap: 0.5rem;
+      display: flex; gap: 0.5rem;
     }
 
     nav a {
-      padding: 0.5rem 1rem;
-      font-weight: bold;
-      color: #0077cc;
-      background: #eee;
-      border-radius: 4px;
-      text-decoration: none;
+      padding: 0.5rem 1rem; font-weight: bold;
+      color: #0077cc; background: #eee;
+      border-radius: 4px; text-decoration: none;
       font-size: 0.9rem;
     }
 
-    nav a:hover,
-    nav a.active {
-      background: #0077cc;
-      color: white;
+    nav a:hover, nav a.active {
+      background: #0077cc; color: white;
     }
 
     #sticky-filters {
-      position: sticky;
-      top: 0;
-      background: #f4f4f4;
-      z-index: 999;
-      padding: 1rem 1rem 0.5rem;
+      position: sticky; top: 0; background: #f4f4f4;
+      z-index: 999; padding: 1rem 1rem 0.5rem;
       border-bottom: 1px solid #ddd;
     }
 
     #search-box {
-      width: 100%;
-      max-width: 900px;
-      margin: 0 auto 1rem;
-      display: block;
-      padding: 0.75rem;
-      font-size: 1rem;
-      border: 1px solid #ccc;
-      border-radius: 6px;
+      width: 100%; max-width: 900px;
+      margin: 0 auto 1rem; display: block;
+      padding: 0.75rem; font-size: 1rem;
+      border: 1px solid #ccc; border-radius: 6px;
     }
 
     .filters {
@@ -94,46 +66,31 @@
       min-width: 180px;
     }
 
-    .filter-group h4 {
-      margin: 0 0 0.5rem;
-      font-size: 0.95rem;
-    }
+    .filter-group h4 { margin: 0 0 0.5rem; font-size: 0.95rem; }
 
     .checkbox-list {
-      max-height: 110px;
-      overflow-y: auto;
+      max-height: 110px; overflow-y: auto;
       border: 1px solid #eee;
-      padding: 0.25rem;
-      border-radius: 4px;
+      padding: 0.25rem; border-radius: 4px;
       background: #fafafa;
     }
 
     .checkbox-list label {
-      display: block;
-      font-size: 0.85rem;
-      margin-bottom: 0.25rem;
-      cursor: pointer;
+      display: block; font-size: 0.85rem;
+      margin-bottom: 0.25rem; cursor: pointer;
     }
 
     .filter-group button {
-      margin-top: 0.25rem;
-      margin-right: 0.25rem;
-      padding: 0.25rem 0.5rem;
-      font-size: 0.75rem;
-      cursor: pointer;
-      border: 1px solid #aaa;
-      background: #eee;
-      border-radius: 4px;
+      margin-top: 0.25rem; margin-right: 0.25rem;
+      padding: 0.25rem 0.5rem; font-size: 0.75rem;
+      cursor: pointer; border: 1px solid #aaa;
+      background: #eee; border-radius: 4px;
     }
 
-    .court-list {
-      max-width: 900px;
-      margin: 2rem auto;
-    }
+    .court-list { max-width: 900px; margin: 2rem auto; }
 
     .court-card {
-      background: white;
-      padding: 1rem;
+      background: white; padding: 1rem;
       border-radius: 8px;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
       margin-bottom: 1.5rem;
@@ -142,48 +99,44 @@
     .badge {
       padding: 0.25rem 0.5rem;
       border-radius: 4px;
-      font-size: 0.85rem;
-      font-weight: bold;
-      color: white;
-      display: inline-block;
+      font-size: 0.85rem; font-weight: bold;
+      color: white; display: inline-block;
     }
 
-    .badge.type {
-      background-color: #28a745;
+    .badge.type { background-color: #28a745; }
+    .badge.lighting-yes { background-color: #e6b800; }
+    .badge.lighting-no, .badge.lighting-unknown { background-color: #888; }
+
+    .court-gallery {
+      display: flex; gap: 0.5rem;
+      margin: 0.5rem 0;
     }
 
-    .badge.lighting-yes {
-      background-color: #e6b800;
+    .court-gallery img {
+      max-width: 80px; max-height: 60px;
+      object-fit: cover; border-radius: 4px;
+      cursor: pointer; transition: transform 0.2s;
     }
 
-    .badge.lighting-no,
-    .badge.lighting-unknown {
-      background-color: #888;
+    .court-gallery img:hover { transform: scale(1.1); }
+
+    .modal {
+      display: none; position: fixed;
+      z-index: 1000; left: 0; top: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8);
+      justify-content: center; align-items: center;
     }
 
-    a {
-      color: #0066cc;
-      text-decoration: none;
-    }
-
-    a:hover {
-      text-decoration: underline;
+    .modal img {
+      max-width: 90%; max-height: 90%;
+      border-radius: 8px;
     }
 
     @media (max-width: 700px) {
-      header {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      nav {
-        margin-top: 0.5rem;
-      }
-
-      .filters {
-        flex-direction: column;
-        align-items: stretch;
-      }
+      header { flex-direction: column; align-items: flex-start; }
+      nav { margin-top: 0.5rem; }
+      .filters { flex-direction: column; align-items: stretch; }
     }
   </style>
 </head>
@@ -204,26 +157,27 @@
 
   <div class="court-list" id="court-list">Loading...</div>
 
+  <div id="image-modal" class="modal" onclick="this.style.display='none'">
+    <img id="modal-img" src="" alt="">
+  </div>
+
   <script>
     const sheetID = "1ZghEOmrIgbT8PIoR-5-ysZWNohyGHz-WEEU-BpeL5_U";
-    const sheetName = "Master";
-    const url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&sheet=${sheetName}`;
+    const mainSheet = "Master";
+    const imagesSheet = "Court Images";
 
     const filterFields = [
-      { id: "Indoor/Outdoor/Both", label: "Indoor/Outdoor" },
+      { id: "Indoor/Outdoor/Both", label: "Court Type" },
       { id: "Seasonal Opportunity", label: "Season" },
       { id: "Lighting", label: "Lighting" },
-      { id: "Court Type", label: "Surface Type" }
+      { id: "Court Type", label: "Surface" }
     ];
 
-    let rows = [];
-    let cols = [];
-    let filters = {};
+    let rows = [], cols = [], filters = {}, images = {};
 
     function createFilterGroup(fieldID, label, options) {
       const container = document.createElement("div");
       container.className = "filter-group";
-
       const title = document.createElement("h4");
       title.textContent = label;
 
@@ -234,14 +188,11 @@
       options.forEach(opt => {
         const id = `${fieldID}-${opt.replace(/\s+/g, "_")}`;
         const checkbox = document.createElement("input");
-        checkbox.type = "checkbox";
-        checkbox.id = id;
-        checkbox.value = opt;
-        checkbox.dataset.field = fieldID;
+        checkbox.type = "checkbox"; checkbox.id = id;
+        checkbox.value = opt; checkbox.dataset.field = fieldID;
 
         const labelEl = document.createElement("label");
-        labelEl.htmlFor = id;
-        labelEl.textContent = opt;
+        labelEl.htmlFor = id; labelEl.textContent = opt;
         labelEl.prepend(checkbox);
         list.appendChild(labelEl);
       });
@@ -264,24 +215,20 @@
       container.appendChild(list);
       container.appendChild(selectAllBtn);
       container.appendChild(resetBtn);
-
       return container;
     }
 
-    function getColumnOptions(colName) {
-      const idx = cols.indexOf(colName);
-      const values = new Set();
-      rows.forEach(row => {
-        const val = row.c[idx]?.v;
-        if (val) values.add(val);
-      });
-      return Array.from(values).sort();
+    function getSelectedValues(fieldID) {
+      return Array.from(filters[fieldID])
+        .filter(cb => cb.checked)
+        .map(cb => cb.value.toLowerCase());
     }
 
     function populateFilters() {
       const container = document.getElementById("filters-container");
       filterFields.forEach(field => {
-        const options = getColumnOptions(field.id);
+        const idx = cols.indexOf(field.id);
+        const options = Array.from(new Set(rows.map(r => r.c[idx]?.v).filter(Boolean))).sort();
         const group = createFilterGroup(field.id, field.label, options);
         container.appendChild(group);
         filters[field.id] = group.querySelectorAll("input[type=checkbox]");
@@ -289,104 +236,97 @@
       });
     }
 
-    function getSelectedValues(fieldID) {
-      return Array.from(filters[fieldID])
-        .filter(cb => cb.checked)
-        .map(cb => cb.value.toLowerCase().trim());
+    function buildImagesLookup(rows, cols) {
+      const nameIdx = cols.indexOf("Location Name");
+      const imgIdxs = cols.map((c,i) => c.startsWith("Image") ? i : -1).filter(i => i !== -1);
+      const lookup = {};
+      rows.forEach(r => {
+        const name = r.c[nameIdx]?.v;
+        if (!name) return;
+        const links = imgIdxs.map(i => r.c[i]?.v).filter(Boolean);
+        if (links.length) lookup[name] = links;
+      });
+      return lookup;
     }
 
-    function renderCards(dataRows, dataCols) {
-      const list = document.getElementById("court-list");
-      list.innerHTML = '';
-
-      if (dataRows.length === 0) {
-        list.innerHTML = `<p style="text-align:center; font-style:italic;">No results found. Try adjusting your filters or search terms.</p>`;
-        return;
-      }
-
-      dataRows.forEach(row => {
-        const data = {};
-        row.c.forEach((cell, i) => {
-          data[dataCols[i]] = cell ? cell.v : '';
-        });
-
-        const lightingVal = (data['Lighting'] || 'Unknown').toLowerCase();
-        let lightingClass = 'lighting-unknown';
-        if (lightingVal.includes('yes') || lightingVal.includes('available')) {
-          lightingClass = 'lighting-yes';
-        } else if (lightingVal.includes('no')) {
-          lightingClass = 'lighting-no';
-        }
-
-        const card = document.createElement("div");
-        card.className = "court-card";
-        card.innerHTML = `
-          <h3>${data['Location Name']}</h3>
-          <p><strong>Address:</strong> ${data['Address']}</p>
-          <p><strong>Outdoor Courts:</strong> ${data['Outdoor Courts #'] || 'N/A'}</p>
-          <p><strong>Indoor Courts:</strong> ${data['Indoor Courts #'] || 'N/A'}</p>
-          <p><strong>Lighting:</strong> <span class="badge ${lightingClass}">${data['Lighting'] || 'Unknown'}</span></p>
-          <p><strong>Type:</strong> <span class="badge type">${data['Indoor/Outdoor/Both'] || 'N/A'}</span></p>
-          <p><strong>Seasonal:</strong> ${data['Seasonal Opportunity'] || 'Unknown'}</p>
-          <p><strong>Court Type:</strong> ${data['Court Type'] || 'Unknown'}</p>
-          <p><a href="https://www.google.com/maps?q=${data['Latitude']},${data['Longitude']}" target="_blank">📍 View on Google Maps</a></p>
-        `;
-        list.appendChild(card);
-      });
+    function openModal(src) {
+      document.getElementById("modal-img").src = src;
+      document.getElementById("image-modal").style.display = "flex";
     }
 
     function applyFiltersAndSearch() {
       const search = document.getElementById("search-box").value.toLowerCase();
       const selected = {};
-      filterFields.forEach(field => {
-        selected[field.id] = getSelectedValues(field.id);
-      });
+      filterFields.forEach(f => selected[f.id] = getSelectedValues(f.id));
 
-      const filtered = rows.filter(row => {
-        const rowData = {};
-        row.c.forEach((cell, i) => {
-          rowData[cols[i]] = cell ? cell.v.toString().toLowerCase().trim() : '';
-        });
-
-        const matchesSearch = Object.values(rowData).some(val =>
-          val && val.includes(search)
+      const filtered = rows.filter(r => {
+        const data = {};
+        r.c.forEach((cell, i) => { data[cols[i]] = cell?.v?.toString().toLowerCase() || ""; });
+        const matchesSearch = Object.values(data).some(val => val.includes(search));
+        const matchesFilters = filterFields.every(f =>
+          selected[f.id].length === 0 || selected[f.id].includes(data[f.id])
         );
-
-        const matchesFilters = filterFields.every(field => {
-          const selectedVals = selected[field.id];
-          const cellVal = rowData[field.id] || '';
-
-          if (field.id === "Indoor/Outdoor/Both" && selectedVals.length > 0) {
-            if (selectedVals.includes("indoor") && cellVal.includes("indoor")) return true;
-            if (selectedVals.includes("outdoor") && cellVal.includes("outdoor")) return true;
-            if (selectedVals.includes("indoor and outdoor") && cellVal === "indoor and outdoor") return true;
-            return false;
-          }
-
-          return selectedVals.length === 0 || selectedVals.includes(cellVal);
-        });
-
         return matchesSearch && matchesFilters;
       });
 
-      renderCards(filtered, cols);
+      renderCards(filtered);
     }
 
-    fetch(url)
-      .then(res => res.text())
-      .then(text => {
-        const json = JSON.parse(text.substr(47).slice(0, -2));
-        rows = json.table.rows;
-        cols = json.table.cols.map(c => c.label);
-        populateFilters();
-        renderCards(rows, cols);
-      })
-      .catch(err => {
-        document.getElementById("court-list").innerHTML = "Failed to load data.";
-        console.error("Fetch error:", err);
-      });
+    function renderCards(filteredRows) {
+      const list = document.getElementById("court-list");
+      list.innerHTML = "";
 
-    document.getElementById('search-box').addEventListener('input', applyFiltersAndSearch);
+      if (!filteredRows.length) {
+        list.innerHTML = "<p style='text-align:center;'>No results found.</p>";
+        return;
+      }
+
+      filteredRows.forEach(row => {
+        const data = {};
+        row.c.forEach((cell, i) => data[cols[i]] = cell?.v || "");
+
+        const lightingVal = (data['Lighting'] || 'unknown').toLowerCase();
+        let lightingClass = 'lighting-unknown';
+        if (lightingVal.includes('yes') || lightingVal.includes('available')) lightingClass = 'lighting-yes';
+        else if (lightingVal.includes('no')) lightingClass = 'lighting-no';
+
+        const imgs = images[data["Location Name"]];
+        const gallery = imgs ? imgs.map(src => `<img src="${src}" onclick="openModal('${src}')">`).join("") : "";
+
+        list.innerHTML += `
+          <div class="court-card">
+            <h3>${data["Location Name"]}</h3>
+            ${gallery ? `<div class="court-gallery">${gallery}</div>` : ""}
+            <p><strong>Address:</strong> ${data["Address"]}</p>
+            <p><strong>Lighting:</strong> <span class="badge ${lightingClass}">${data["Lighting"] || 'Unknown'}</span></p>
+            <p><strong>Type:</strong> <span class="badge type">${data["Indoor/Outdoor/Both"] || 'N/A'}</span></p>
+            <p><a href="https://www.google.com/maps?q=${data["Latitude"]},${data["Longitude"]}" target="_blank">📍 View on Google Maps</a></p>
+          </div>`;
+      });
+    }
+
+    async function fetchSheet(sheetName) {
+      const url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheetName)}`;
+      const res = await fetch(url);
+      const text = await res.text();
+      const json = JSON.parse(text.substr(47).slice(0, -2));
+      return { cols: json.table.cols.map(c => c.label), rows: json.table.rows };
+    }
+
+    async function init() {
+      const [main, img] = await Promise.all([
+        fetchSheet(mainSheet),
+        fetchSheet(imagesSheet)
+      ]);
+      cols = main.cols;
+      rows = main.rows;
+      images = buildImagesLookup(img.rows, img.cols);
+      populateFilters();
+      renderCards(rows);
+    }
+
+    document.addEventListener("DOMContentLoaded", init);
+    document.getElementById("search-box").addEventListener("input", applyFiltersAndSearch);
   </script>
 
 </body>
